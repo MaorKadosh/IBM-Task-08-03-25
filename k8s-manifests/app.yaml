@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world
+  namespace: elastic-stack
+  labels:
+    app: hello-world
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - name: hello-world
+        image: busybox:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - >
+            while true; do
+              echo "Hello, Kubernetes! The time is $(date)";
+              sleep 5;
+            done
+        resources:
+          limits:
+            memory: 64Mi
+            cpu: 100m
+          requests:
+            memory: 32Mi
+            cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+  namespace: elastic-stack
+  labels:
+    app: hello-world
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: hello-world
